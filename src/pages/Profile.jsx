@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import axiosInstance from "../api/axiosInstance";
+import toast from "react-hot-toast";
 
 export default function Profile() {
   const [user, setUser] = useState(null);
@@ -41,13 +42,13 @@ export default function Profile() {
   const updateBio = async () => {
     try {
       const res = await axiosInstance.put(`/users/${userId}/bio`, { bio });
-      setUser((u) => ({ ...u, profile: { ...u.profile, bio } }));
+      setUser(res.data);
       setEditing((s) => ({ ...s, profile: false }));
-      alert("Bio updated!");
+      toast.success("Bio updated!");
       return res;
     } catch (err) {
       console.error(err);
-      alert("Failed to update bio");
+      toast.error("Failed to update bio");
     }
   };
 
@@ -55,13 +56,13 @@ export default function Profile() {
   const updateLocation = async () => {
     try {
       const res = await axiosInstance.put(`/users/${userId}/location`, { location });
-      setUser((u) => ({ ...u, profile: { ...u.profile, location } }));
+      setUser(res.data);
       setEditing((s) => ({ ...s, profile: false }));
-      alert("Location updated!");
+      toast.success("Location updated!");
       return res;
     } catch (err) {
       console.error(err);
-      alert("Failed to update location");
+      toast.error("Failed to update location");
     }
   };
 
@@ -75,30 +76,31 @@ export default function Profile() {
           : [],
       };
       const res = await axiosInstance.put(`/users/${userId}/preferences`, payload);
-      setUser((u) => ({ ...u, preferences: payload }));
+      setUser(res.data);
       setEditing((s) => ({ ...s, preferences: false }));
-      alert("Preferences updated!");
+      toast.success("Preferences updated!");
       return res;
     } catch (err) {
       console.error(err);
-      alert("Failed to update preferences");
+      toast.error("Failed to update preferences");
     }
   };
 
   // ✅ Change Password
   const changePassword = async () => {
     try {
-      await axiosInstance.put(`/users/${userId}/password`, {
+      const res = await axiosInstance.put(`/users/${userId}/password`, {
         oldPassword,
         newPassword,
       });
-      alert("Password changed!");
+      setUser(res.data);
+      toast.success("Password changed!");
       setOldPassword("");
       setNewPassword("");
       setEditing((s) => ({ ...s, password: false }));
     } catch (err) {
       console.error(err);
-      alert("Failed to change password");
+      toast.error("Failed to change password");
     }
   };
 
@@ -212,7 +214,11 @@ export default function Profile() {
             </div>
 
             {!editing.password ? (
-              <p className="mt-3 text-sm text-gray-500">Last updated: {new Date(user.updatedAt).toLocaleDateString()}</p>
+              <p className="mt-3 text-sm text-gray-500">
+                Last updated: {user.updatedAt && !isNaN(new Date(user.updatedAt).getTime()) 
+                  ? new Date(user.updatedAt).toLocaleDateString() 
+                  : "Not available"}
+              </p>
             ) : (
               <div className="mt-3 space-y-3">
                 <input type="password" placeholder="Old password" value={oldPassword} onChange={(e) => setOldPassword(e.target.value)} className="w-full px-3 py-2 border rounded-md" />

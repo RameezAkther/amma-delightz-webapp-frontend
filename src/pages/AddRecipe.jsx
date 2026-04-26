@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import axiosInstance from "../api/axiosInstance";
 import { useNavigate, useLocation } from "react-router-dom";
+import toast from "react-hot-toast";
 
 export default function AddRecipe() {
   const navigate = useNavigate();
@@ -166,13 +167,13 @@ export default function AddRecipe() {
         await axiosInstance.put(`/recipes/${editingId}`, recipeData, {
           headers: { Authorization: `Bearer ${token}` },
         });
-        alert("✅ Recipe updated successfully!");
+        toast.success("✅ Recipe updated successfully!");
         navigate(`/recipes/${editingId}`);
       } else {
         await axiosInstance.post("/recipes", recipeData, {
           headers: { Authorization: `Bearer ${token}` },
         });
-        alert("✅ Recipe added successfully!");
+        toast.success("✅ Recipe added successfully!");
         navigate("/recipes");
       }
     } catch (err) {

@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { Eye, EyeOff } from "lucide-react";
 import axiosInstance from "../api/axiosInstance";
 import { useNavigate, Link } from "react-router-dom";
 
@@ -6,6 +7,7 @@ export default function Login() {
   const [formData, setFormData] = useState({ email: "", password: "" });
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
   const navigate = useNavigate();
 
   const handleChange = (e) => {
@@ -63,14 +65,24 @@ export default function Login() {
               className="border p-3 w-full rounded-md focus:outline-none focus:ring-2 focus:ring-green-600"
             />
 
-            <input
-              name="password"
-              placeholder="Password"
-              type="password"
-              onChange={handleChange}
-              required
-              className="border p-3 w-full rounded-md focus:outline-none focus:ring-2 focus:ring-green-600"
-            />
+            <div className="relative">
+              <input
+                name="password"
+                placeholder="Password"
+                type={showPassword ? "text" : "password"}
+                onChange={handleChange}
+                required
+                className="border p-3 w-full rounded-md focus:outline-none focus:ring-2 focus:ring-green-600"
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword((prev) => !prev)}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-600 hover:text-gray-900"
+                aria-label={showPassword ? "Hide password" : "Show password"}
+              >
+                {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+              </button>
+            </div>
 
             <button
               type="submit"

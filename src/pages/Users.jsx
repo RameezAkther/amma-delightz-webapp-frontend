@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import axiosInstance from "../api/axiosInstance";
+import toast from "react-hot-toast";
 
 export default function AdminUsers() {
   const [users, setUsers] = useState([]);
@@ -28,7 +29,7 @@ export default function AdminUsers() {
         setTotalPages(res.data.pages);
       } catch (err) {
         console.error(err);
-        alert("Failed to load users");
+        toast.error("Failed to load users");
       } finally {
         setLoading(false);
       }
@@ -51,10 +52,10 @@ export default function AdminUsers() {
     try {
       await axiosInstance.delete(`/admin/users/${id}`);
       setUsers((prev) => prev.filter((u) => u.id !== id));
-      alert("User deleted!");
+      toast.success("User deleted!");
     } catch (err) {
       console.error(err);
-      alert("Failed to delete user");
+      toast.error("Failed to delete user");
     }
   };
 

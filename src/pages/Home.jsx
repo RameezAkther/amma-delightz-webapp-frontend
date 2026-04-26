@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import axiosInstance from "../api/axiosInstance";
+import toast from "react-hot-toast";
 import Hero from "../components/Hero";
 import RecipeCard from "../components/RecipeCard";
 import Footer from "../components/Footer";
@@ -7,8 +8,39 @@ import Contact from "../components/Contact";
 
 export default function Home() {
   const [recipes, setRecipes] = useState([]);
+  const [favoriteIds, setFavoriteIds] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+
+  // Load Favorite IDs
+  useEffect(() => {
+    const userId = localStorage.getItem("userId");
+    if (!userId) return;
+
+    axiosInstance
+      .get(`/favorites/${userId}`)
+      .then((res) => setFavoriteIds(res.data.map((f) => f.recipeId)))
+      .catch(() => setFavoriteIds([]));
+  }, []);
+
+  const toggleFavorite = async (recipeId, isFav) => {
+    const userId = localStorage.getItem("userId");
+    if (!userId) return toast.error("Login required");
+
+    try {
+      if (!isFav) {
+        await axiosInstance.post("/favorites", { userId, recipeId });
+        setFavoriteIds((prev) => [...prev, recipeId]);
+      } else {
+        await axiosInstance.delete("/favorites", {
+          data: { userId, recipeId },
+        });
+        setFavoriteIds((prev) => prev.filter((id) => id !== recipeId));
+      }
+    } catch {
+      toast.error("Failed to update favorites");
+    }
+  };
 
   useEffect(() => {
     const fetchRecipes = async () => {
@@ -40,7 +72,12 @@ export default function Home() {
         {!loading && !error && (
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8">
             {recipes.map((recipe) => (
-              <RecipeCard key={recipe.id} recipe={recipe} />
+              <RecipeCard
+                key={recipe.id}
+                recipe={recipe}
+                isFavorited={favoriteIds.includes(recipe.id)}
+                onToggleFavorite={toggleFavorite}
+              />
             ))}
           </div>
         )}

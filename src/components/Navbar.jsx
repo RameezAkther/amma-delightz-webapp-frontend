@@ -1,6 +1,7 @@
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { useEffect, useRef, useState } from "react";
 import axiosInstance from "../api/axiosInstance";
+import toast from "react-hot-toast";
 
 export default function Navbar() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -65,7 +66,7 @@ export default function Navbar() {
         },
       })
       .then((res) => {
-        setRole(res.data.admin ? "ADMIN" : "USER");
+        setRole(res.data.isAdmin ? "ADMIN" : "USER");
       })
       .catch(() => {
         setRole("USER");
@@ -110,6 +111,7 @@ export default function Navbar() {
 
   const handleLogout = () => {
     localStorage.removeItem("token");
+    localStorage.removeItem("userId");
     setIsLoggedIn(false);
     setRole(null);
     navigate("/login");
@@ -214,7 +216,13 @@ export default function Navbar() {
               <button
                 key={id}
                 data-id={id}
-                onClick={action}
+                onClick={(e) => {
+                  if (id !== "home" && !isLoggedIn) {
+                    toast.error("please log in");
+                    return;
+                  }
+                  action();
+                }}
                 className={`nav-link inline-flex items-center justify-center h-full px-4 text-sm font-medium whitespace-nowrap ${
                   activeId === id ? "text-white" : "text-white/80 hover:text-white"
                 }`}
@@ -226,6 +234,12 @@ export default function Navbar() {
                 key={id}
                 to={to}
                 data-id={id}
+                onClick={(e) => {
+                  if (id !== "home" && !isLoggedIn) {
+                    e.preventDefault();
+                    toast.error("please log in");
+                  }
+                }}
                 className={`nav-link inline-flex items-center justify-center h-full px-4 text-sm font-medium whitespace-nowrap ${
                   activeId === id ? "text-white" : "text-white/80 hover:text-white"
                 }`}
@@ -280,11 +294,33 @@ export default function Navbar() {
         <div className="md:hidden bg-black/90 px-6 py-4 space-y-3">
           {centerNavItems.map(({ label, to, id, action }) =>
             action ? (
-              <button key={id} onClick={action} className="block text-white w-full text-left">
+              <button 
+                key={id} 
+                onClick={(e) => {
+                  if (id !== "home" && !isLoggedIn) {
+                    toast.error("please log in");
+                    return;
+                  }
+                  action();
+                }} 
+                className="block text-white w-full text-left"
+              >
                 {label}
               </button>
             ) : (
-              <Link key={id} to={to} onClick={() => setMenuOpen(false)} className="block text-white">
+              <Link 
+                key={id} 
+                to={to} 
+                onClick={(e) => {
+                  if (id !== "home" && !isLoggedIn) {
+                    e.preventDefault();
+                    toast.error("please log in");
+                  } else {
+                    setMenuOpen(false);
+                  }
+                }} 
+                className="block text-white"
+              >
                 {label}
               </Link>
             )

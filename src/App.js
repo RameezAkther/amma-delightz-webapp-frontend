@@ -10,11 +10,13 @@ import Profile from "./pages/Profile";
 import AddRecipe from "./pages/AddRecipe";
 import Users from "./pages/Users";
 import Chatbot from "./components/Chatbot";
+import { Toaster } from "react-hot-toast";
 
 
 export default function App() {
   return (
     <Router>
+      <Toaster position="top-center" reverseOrder={false} />
       <Navbar />
       <Routes>
         <Route path="/" element={<Home />} />

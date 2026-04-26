@@ -1,5 +1,6 @@
 import { useState } from "react";
 import axiosInstance from "../api/axiosInstance";
+import toast from "react-hot-toast";
 
 export default function Chatbot() {
   const [open, setOpen] = useState(false);
@@ -14,7 +15,7 @@ export default function Chatbot() {
 
     const token = localStorage.getItem("token");
     if (!token) {
-      alert("Please login to use the chatbot");
+      toast.error("Please login to use the chatbot");
       return;
     }
 
@@ -39,7 +40,7 @@ export default function Chatbot() {
 
     } catch (err) {
       console.error(err);
-      alert("Chatbot failed to respond");
+      toast.error("Chatbot failed to respond");
     } finally {
       setLoading(false);
     }

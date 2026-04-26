@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { Eye, EyeOff } from "lucide-react";
 import axiosInstance from "../api/axiosInstance";
 import { useNavigate, Link } from "react-router-dom";
 
@@ -18,6 +19,8 @@ export default function Signup() {
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const navigate = useNavigate();
 
   const handleChange = (e) => {
@@ -59,7 +62,7 @@ export default function Signup() {
       window.location.reload();
     } catch (err) {
       console.error(err);
-      setError(err?.response?.data?.message || "Signup failed. Please try again.");
+      setError(err?.response?.data?.message || "Signup failed. Username or Email ID already exists");
     } finally {
       setLoading(false);
     }
@@ -160,12 +163,48 @@ export default function Signup() {
 
               <div>
                 <label className="text-sm font-medium text-gray-700">Password</label>
-                <input name="passwordHash" value={formData.passwordHash} placeholder="Password" type="password" onChange={handleChange} required className="border p-3 w-full rounded-md focus:outline-none focus:ring-2 focus:ring-green-600 mt-1" />
+                <div className="relative mt-1">
+                  <input
+                    name="passwordHash"
+                    value={formData.passwordHash}
+                    placeholder="Password"
+                    type={showPassword ? "text" : "password"}
+                    onChange={handleChange}
+                    required
+                    className="border p-3 w-full rounded-md focus:outline-none focus:ring-2 focus:ring-green-600"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword((prev) => !prev)}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-600 hover:text-gray-900"
+                    aria-label={showPassword ? "Hide password" : "Show password"}
+                  >
+                    {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                  </button>
+                </div>
               </div>
 
               <div>
                 <label className="text-sm font-medium text-gray-700">Re-enter Password</label>
-                <input name="confirmPassword" value={formData.confirmPassword} placeholder="Re-enter Password" type="password" onChange={handleChange} required className="border p-3 w-full rounded-md focus:outline-none focus:ring-2 focus:ring-green-600 mt-1" />
+                <div className="relative mt-1">
+                  <input
+                    name="confirmPassword"
+                    value={formData.confirmPassword}
+                    placeholder="Re-enter Password"
+                    type={showConfirmPassword ? "text" : "password"}
+                    onChange={handleChange}
+                    required
+                    className="border p-3 w-full rounded-md focus:outline-none focus:ring-2 focus:ring-green-600"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowConfirmPassword((prev) => !prev)}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-600 hover:text-gray-900"
+                    aria-label={showConfirmPassword ? "Hide confirm password" : "Show confirm password"}
+                  >
+                    {showConfirmPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                  </button>
+                </div>
               </div>
 
               <div className="flex items-center justify-between mt-4">

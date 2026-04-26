@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axiosInstance from "../api/axiosInstance";
+import toast from "react-hot-toast";
 import RecipeCard from "../components/RecipeCard";
 import Footer from "../components/Footer";
 import Contact from "../components/Contact";
@@ -46,7 +47,7 @@ export default function Recipes() {
       .get("/auth/is-admin", {
         headers: { Authorization: `Bearer ${token}` },
       })
-      .then((res) => setIsAdmin(res.data.admin === true))
+      .then((res) => setIsAdmin(res.data.isAdmin === true))
       .catch(() => setIsAdmin(false));
   }, []);
 
@@ -105,7 +106,9 @@ export default function Recipes() {
         `/favorites/${userId}/paged?page=${pageNumber}&limit=9`
       );
 
-      setRecipes(res.data.recipes);
+      const fetchedFavorites = res.data.recipes || [];
+      const extractedRecipes = fetchedFavorites.map((f) => f.recipe || f);
+      setRecipes(extractedRecipes);
       setFavPages(res.data.pages);
       setFavPage(res.data.page);
       setOnlyFavorites(true);
@@ -135,7 +138,7 @@ export default function Recipes() {
   // ✅ Toggle Favorite Add / Remove
   const toggleFavorite = async (recipeId, isFav) => {
     const userId = localStorage.getItem("userId");
-    if (!userId) return alert("Login required");
+    if (!userId) return toast.error("Login required");
 
     try {
       if (!isFav) {
@@ -152,7 +155,7 @@ export default function Recipes() {
         }
       }
     } catch {
-      alert("Failed to update favorites");
+      toast.error("Failed to update favorites");
     }
   };
 
@@ -231,7 +234,7 @@ export default function Recipes() {
                 recipe={recipe}
                 showButton
                 isFavorited={favoriteIds.includes(recipe.id)}
-                onToggleFavorite={toggleFavorite}
+                onToggleFavorite={(id, isFav) => toggleFavorite(id, isFav)}
               />
 
               {isAdmin && (
@@ -269,9 +272,8 @@ export default function Recipes() {
               <button
                 key={i}
                 onClick={() => setPage(i + 1)}
-                className={`w-10 h-10 rounded-full ${
-                  page === i + 1 ? "bg-green-700 text-white" : "border"
-                }`}
+                className={`w-10 h-10 rounded-full ${page === i + 1 ? "bg-green-700 text-white" : "border"
+                  }`}
               >
                 {i + 1}
               </button>
@@ -286,9 +288,8 @@ export default function Recipes() {
               <button
                 key={i}
                 onClick={() => fetchFavoriteRecipes(i + 1)}
-                className={`w-10 h-10 rounded-full ${
-                  favPage === i + 1 ? "bg-green-700 text-white" : "border"
-                }`}
+                className={`w-10 h-10 rounded-full ${favPage === i + 1 ? "bg-green-700 text-white" : "border"
+                  }`}
               >
                 {i + 1}
               </button>
@@ -302,3 +303,4 @@ export default function Recipes() {
     </>
   );
 }
+
